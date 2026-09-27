@@ -27,6 +27,13 @@ data/patches/*
 data/splits/*
 !data/splits/.gitkeep
 
+# Kaggle dataset images - too large for Git, stored locally only
+data/kaggle/data/Class_0/
+data/kaggle/data/Class_1/
+data/kaggle/data/sample/
+# Keep kaggle metadata
+!data/kaggle/metadata/
+
 # Checkpoints and models
 artifacts/checkpoints/*
 !artifacts/checkpoints/.gitkeep

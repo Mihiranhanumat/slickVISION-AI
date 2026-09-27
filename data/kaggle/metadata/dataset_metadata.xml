@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dcterms:dc xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://purl.org/dc/elements/1.1/ https://dublincore.org/schemas/xmls/qdc/2008/02/11/dcterms.xsd">
+  <dc:title>CSIRO Sentinel-1 SAR image dataset of oil- and non-oil features for machine learning ( Deep Learning )</dc:title>
+  <dc:creator>David Blondeau-Patissier</dc:creator>
+  <dc:subject>Computer Software not elsewhere classified</dc:subject>
+  <dc:subject>Environmental Management</dc:subject>
+  <dc:description>What this collection is:
+A curated, binary-classified image dataset of grayscale (1 band) 400 x 400-pixel size, or image chips, in a JPEG format extracted from processed Sentinel-1 Synthetic Aperture Radar (SAR) satellite scenes acquired over various regions of the world, and featuring clear open ocean chips, look-alikes (wind or biogenic features) and oil slick chips.
+
+This binary dataset contains chips  labelled as:
+- &amp;quot;0&amp;quot; for chips not containing any oil features (look-alikes or clean seas)  
+- &amp;quot;1&amp;quot; for those containing oil features. 
+
+This binary dataset is imbalanced, and biased towards &amp;quot;0&amp;quot; labelled chips (i.e.,  no oil features), which correspond to 66% of the dataset.
+Chips containing oil features, labelled &amp;quot;1&amp;quot;, correspond to 34% of the dataset.
+
+Why:
+This dataset can be used for training, validation and/or testing of machine learning, including deep learning, algorithms for the detection of oil features in SAR imagery. Directly applicable for algorithm development for the European Space Agency Sentinel-1 SAR mission (https://sentinel.esa.int/web/sentinel/missions/sentinel-1 ), it may be suitable for the development of detection algorithms for other SAR satellite sensors.
+
+Overview of this dataset:
+Total number of chips (both classes) is N=5,630
+Class 	       0	        1
+Total		3,725	1,905
+
+Further information and description is found in the ReadMe file provided (ReadMe_Sentinel1_SAR_OilNoOil_20221215.txt)</dc:description>
+  <dc:publisher>CSIRO</dc:publisher>
+  <dc:contributor>Thomas Schroeder</dc:contributor>
+  <dc:contributor>Foivos Diakogiannis</dc:contributor>
+  <dc:contributor>Zhibin Li</dc:contributor>
+  <dc:date>2022-12-15</dc:date>
+  <dc:type />
+  <dc:format />
+  <dc:identifier>https://doi.org/10.25919/4v55-dn16</dc:identifier>
+  <dc:language />
+  <dcterms:temporal xsi:type="dcterms:Period">start=2015-05-01; end=2022-08-31</dcterms:temporal>
+  <dcterms:spatial xsi:type="dcterms:Box">northlimit=21.1192; southlimit=-26.0723; westlimit=101.4091; eastLimit=154.7679; projection=WGS84</dcterms:spatial>
+  <dc:rights />
+</dcterms:dc>

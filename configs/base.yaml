@@ -7,6 +7,7 @@ project:
 
 paths:
   raw_data_dir: "data/raw"
+  kaggle_data_dir: "data/kaggle/data"
   processed_data_dir: "data/processed"
   patches_dir: "data/patches"
   splits_dir: "data/splits"
@@ -16,7 +17,8 @@ paths:
   checkpoints_dir: "artifacts/checkpoints"
 
 dataset:
-  name: "krestenitis_2019"
+  name: "csiro_sentinel1_oilspill"
+  source: "CSIRO Sentinel-1 SAR Dataset / Kaggle DL"
   num_classes: 5
   classes:
     0: "sea_surface"
@@ -30,16 +32,16 @@ dataset:
     2: [255, 0, 0]      # Look-alike - Red
     3: [150, 0, 150]    # Ship - Purple / Magenta
     4: [0, 100, 0]      # Land - Dark Green
-  image_width: 1250
-  image_height: 650
+  image_width: 400
+  image_height: 400
   channels: 1
-  val_split_ratio: 0.20 # 20% of 1002 training parent images -> 200 val, 802 train
+  val_split_ratio: 0.15 # 15% validation, 15% test, 70% train
 
 patching:
   patch_size: 256
-  train_stride: 192    # Overlap = 64px (256 - 192)
-  val_stride: 256      # Non-overlapping deterministic tiling
-  test_stride: 256     # Non-overlapping deterministic tiling
+  train_stride: 144    # Overlap for 400x400 chips -> 4 patches per chip
+  val_stride: 256      # Tiling for validation
+  test_stride: 256     # Tiling for test
   pad_mode: "reflect"
 
 augmentation:

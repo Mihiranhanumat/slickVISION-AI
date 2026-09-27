@@ -40,6 +40,7 @@ def main():
     set_seed(seed)
 
     raw_dir = Path(cfg["paths"]["raw_data_dir"])
+    kaggle_dir = Path(cfg["paths"].get("kaggle_data_dir", "data/kaggle/data"))
     patches_dir = Path(cfg["paths"]["patches_dir"])
     splits_dir = Path(cfg["paths"]["splits_dir"])
     reports_dir = Path(cfg["paths"]["reports_dir"])
@@ -47,21 +48,25 @@ def main():
     for d in [patches_dir, splits_dir, reports_dir]:
         d.mkdir(parents=True, exist_ok=True)
 
-    # Check if raw data exists with image files
-    img_files = list(raw_dir.rglob("*.jpg")) + list(raw_dir.rglob("*.png")) + list(raw_dir.rglob("*.bmp"))
-    if not raw_dir.exists() or len(img_files) == 0:
-        if args.auto_generate:
+    # 1. Ingest real dataset if raw images are not yet prepared
+    img_files = list(raw_dir.rglob("*.jpg")) + list(raw_dir.rglob("*.png"))
+    if len(img_files) == 0:
+        if kaggle_dir.exists() and (kaggle_dir / "Class_0").exists() and (kaggle_dir / "Class_1").exists():
+            logger.info(f"Found real Sentinel-1 SAR dataset in {kaggle_dir}. Ingesting real scenes...")
+            from oilspill.data.ingest import ingest_kaggle_dataset
+            ingest_kaggle_dataset(kaggle_data_dir=kaggle_dir, output_raw_dir=raw_dir)
+        elif args.auto_generate:
             logger.info("Raw data directory contains no image files. Auto-generating synthetic benchmark scenes...")
             from generate_synthetic_data import generate_benchmark
             generate_benchmark(output_dir=raw_dir, num_train=12, num_test=4, seed=seed)
         else:
             logger.error(
-                f"Raw data directory '{raw_dir}' contains no image files.\n"
-                "Please place Krestenitis dataset in data/raw/ or run with --auto-generate / python scripts/download_data.py --synthetic"
+                f"No dataset found in '{raw_dir}' or '{kaggle_dir}'.\n"
+                "Please ensure the dataset folder is located in data/kaggle or data/raw."
             )
             sys.exit(1)
 
-    # 1. Discover scenes
+    # 2. Discover scenes
     train_dir = raw_dir / "train"
     test_dir = raw_dir / "test"
 
@@ -73,9 +78,10 @@ def main():
         if len(all_imgs) == 0:
             logger.error(f"No valid image/mask pairs found in {raw_dir}")
             sys.exit(1)
-        # Default split 80% train, 20% test if flat directory
+        # Split: 70% Train, 15% Validation, 15% Test
+        val_ratio = cfg["dataset"].get("val_split_ratio", 0.15)
         train_raw_imgs, test_imgs, train_raw_msks, test_msks = train_test_split(
-            all_imgs, all_msks, test_size=0.15, random_state=seed
+            all_imgs, all_msks, test_size=val_ratio, random_state=seed
         )
 
     logger.info(f"Loaded {len(train_raw_imgs)} official training scenes, {len(test_imgs)} official test scenes.")

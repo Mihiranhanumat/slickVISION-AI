@@ -4,6 +4,7 @@ from .dataset import KrestenitisDataset, rgb_to_mask, mask_to_rgb, CLASS_NAMES, 
 from .validation import DatasetAuditor, audit_dataset_directory
 from .patching import PatchExtractor, extract_dataset_patches
 from .transforms import get_training_transforms, get_validation_transforms, normalize_sar
+from .ingest import ingest_kaggle_dataset, generate_chip_mask
 
 __all__ = [
     "KrestenitisDataset",
@@ -18,4 +19,6 @@ __all__ = [
     "get_training_transforms",
     "get_validation_transforms",
     "normalize_sar",
+    "ingest_kaggle_dataset",
+    "generate_chip_mask",
 ]
