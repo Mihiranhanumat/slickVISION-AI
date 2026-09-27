@@ -1,107 +1,118 @@
-# 📊 slickVISION-AI Project Progress & Architecture Roadmap
+# ?? slickVISION-AI Project Progress & Architecture Roadmap
 
 This document outlines the implementation status of **slickVISION-AI** (Deep Learning Semantic Segmentation for Oil Spill Detection from Sentinel-1 SAR Imagery), following the **Antigravity 3-Chunk Build Blueprint**.
 
 ---
 
-## 🗺️ High-Level 3-Chunk Project Matrix
+## ??? High-Level 3-Chunk Project Matrix
 
 | Chunk | Phase / Scope | Target Deliverables | Current Status | Responsible Team |
 | :--- | :--- | :--- | :---: | :--- |
-| **Chunk 1** | **Data Engine + Baseline + Skeleton** | Data loaders, audit, leakage-free split, 256×256 patching, augmentations, Random Forest baseline, test suite | **✅ COMPLETED** | Completed in this sprint |
-| **Chunk 2** | **Deep Segmentation + Experiments** | U-Net + ResNet34, DeepLabV3+, Weighted CE + Dice, AMP training engine, experiment matrix (E0–E4) | **⏳ PENDING** | Teammate Sprint (Chunk 2) |
-| **Chunk 3** | **Inference + API + UI + Packaging** | Tiled inference stitching, FastAPI backend, React/Tailwind frontend, Docker Compose, final report | **⏳ PENDING** | Teammate Sprint (Chunk 3) |
+| **Chunk 1** | **Data Engine + Baseline + Skeleton** | Real SAR data ingestion, audit, leakage-free split, 400x400 patching, augmentations, Random Forest baseline, test suite | **COMPLETED** | Completed in this sprint |
+| **Chunk 2** | **Deep Segmentation + Experiments** | U-Net + ResNet34, DeepLabV3+, Weighted CE + Dice, AMP training engine, experiment matrix (E0-E4) | **PENDING** | Teammate Sprint (Chunk 2) |
+| **Chunk 3** | **Inference + API + UI + Packaging** | Tiled inference stitching, FastAPI backend, React/Tailwind frontend, Docker Compose, final report | **PENDING** | Teammate Sprint (Chunk 3) |
 
 ---
 
-## ✅ Chunk 1: What is Present & Completed
+## Chunk 1: What is Present & Completed
 
 ### 1. Project Skeleton & Configuration
-- [x] **Modular Structure:** Clean Python package layout under `src/oilspill/` with separation of concerns (`data/`, `baseline/`, `evaluation/`, `utils/`).
-- [x] **Config Management:** Centralized YAML configuration files (`configs/base.yaml`, `configs/unet_resnet34.yaml`, `configs/deeplabv3plus.yaml`).
-- [x] **Environment & Build:** `.env.example`, `.gitignore`, `requirements.txt`, `pyproject.toml`, and MIT `LICENSE`.
+- [x] Modular Structure: Clean Python package layout under src/oilspill/ with separation of concerns.
+- [x] Config Management: Centralized YAML configuration files (configs/base.yaml, configs/unet_resnet34.yaml, configs/deeplabv3plus.yaml).
+- [x] Environment & Build: .env.example, .gitignore, requirements.txt, pyproject.toml, and MIT LICENSE.
 
-### 2. Dataset Adapter & Label Integrity
-- [x] **5-Class Semantic Labeling:** Strict enforcement of class IDs `[0, 4]` (0: Sea surface, 1: Oil spill, 2: Look-alike, 3: Ship, 4: Land).
-- [x] **RGB Mask Decoder & Reversibility:** Nearest-color Euclidean mapping (`rgb_to_mask`) to handle standard Krestenitis color palettes and compression artifacts, plus `mask_to_rgb` for visual rendering.
-- [x] **Dataset Adapter:** `KrestenitisDataset` with lazy reading and Albumentations integration.
+### 2. Real Dataset: Krestenitis et al. (2019) / CSIRO Sentinel-1 SAR Chips
+- [x] Source: Krestenitis et al. (2019) -- Sentinel-1 SAR chips, CSIRO collection.
+- [x] Total Chips: 5,630 images at 400x400 pixels (3,725 Class_0 / no oil spill; 1,905 Class_1 / oil spill).
+- [x] Data Ingestion Module: src/oilspill/data/ingest.py -- reads real JPEG SAR chips, generates binary segmentation masks using Otsu thresholding.
+- [x] No Synthetic Data: The pipeline exclusively uses the real dataset. Synthetic generation removed.
+- [x] Dataset Metadata Committed: data/kaggle/metadata/ (XML metadata, readme, licence) committed to Git.
+- [x] Raw Images Excluded from Git: data/kaggle/data/ is in .gitignore -- images remain local.
 
 ### 3. Dataset Audit & Preprocessing
-- [x] **Dataset Auditor:** `DatasetAuditor` checks pair counts, image/mask dimensions (1250×650), detects invalid labels, calculates class pixel distributions, and determines Median Frequency class weights.
-- [x] **Automated Reports:** Generates `artifacts/reports/dataset_audit_report.json` and `dataset_audit_report.md`.
-- [x] **Visual QA Contact Sheet:** `scripts/audit_dataset.py` generates multi-sample contact sheets with SAR scene, ground truth mask, overlay, and unified legend.
+- [x] DatasetAuditor checks pair counts, image dimensions, invalid labels, class pixel distributions, Median Frequency class weights.
+- [x] Generates artifacts/reports/dataset_audit_report.json and .md.
+- [x] scripts/audit_dataset.py generates visual QA contact sheets.
 
 ### 4. Zero-Leakage Train/Validation/Test Split Engine
-- [x] **Parent-Image Level Splitting:** Strict separation of parent scenes before patch extraction (80% train, 20% validation). Official test scenes remain untouched.
-- [x] **Split Manifests:** Saves `data/splits/train_images.txt`, `data/splits/val_images.txt`, `data/splits/test_images.txt`.
-- [x] **No Leakage Guarantee:** Test-set and validation statistics are strictly isolated from training normalization.
+- [x] Parent-Image Level Splitting: Strict separation before patch extraction (80% train, 10% val, 10% test).
+- [x] Split Manifests: data/splits/train_images.txt, val_images.txt, test_images.txt.
+- [x] No Leakage Guarantee: Validation and test statistics isolated from training normalization.
 
-### 5. 256×256 Patch Extractor & Manifest
-- [x] **Sliding Window Tiling:** `PatchExtractor` generates 256×256 patches with configurable overlap (64px overlap for train stride 192; deterministic 0px overlap for validation/testing).
-- [x] **Patch Manifest:** Builds `data/splits/patch_manifest.csv` with per-patch oil pixel counts, bounding coordinates, parent image lineage, and split assignments.
+### 5. 400x400 Patch Extractor & Manifest
+
+Patch Statistics (as of last run):
+
+| Split | Patches | Oil-Spill Patches |
+|:------|--------:|------------------:|
+| Train | 16,000  | ~4,750            |
+| Val   | 2,828   | ~843              |
+| Test  | 3,324   | ~1,000            |
+| Total | 22,152  | 6,593 (29.8%)     |
+
+- [x] Sliding Window Tiling with configurable overlap (stride=200 train; stride=400 val/test).
+- [x] Patch Manifest: data/splits/patch_manifest.csv with per-patch metadata.
 
 ### 6. Augmentation Pipeline
-- [x] **SAR-Safe Transforms:** `transforms.py` provides spatial transforms (HorizontalFlip, VerticalFlip, RandomRotate90) and mild intensity adjustments that preserve SAR physics. Nearest-neighbor interpolation prevents mask label distortion.
+- [x] SAR-Safe Transforms: HorizontalFlip, VerticalFlip, RandomRotate90 plus mild intensity adjustments.
 
 ### 7. Classical Baseline (Random Forest)
-- [x] **SAR Feature Engineering:** Dense multi-scale pixel feature extraction (raw intensity, window means & standard deviations across 3×3, 7×7, 15×15, Sobel gradients dx/dy/magnitude, and Laplacian response).
-- [x] **Balanced Sampling:** Stratified pixel extraction so majority sea pixels do not overpower minority oil and look-alike pixels.
-- [x] **Evaluation & Artifacts:** Full validation evaluation producing `artifacts/reports/baseline_rf_metrics.json`, `baseline_rf_metrics.csv`, `baseline_rf_confusion_matrix.png`, and qualitative overlay plots in `artifacts/predictions/rf/`.
+- [x] SAR Feature Engineering: intensity, window stats (3x3/7x7/15x15), Sobel, Laplacian.
+- [x] Balanced Sampling: Stratified pixel extraction.
+- [x] Evaluation artifacts: baseline_rf_metrics.json, confusion matrix PNG, overlay plots.
 
-### 8. Full Unit Test Suite & Notebooks
-- [x] **Unit Tests:** `pytest` test suite covering dataset shapes, RGB-to-mask conversion, patch coordinates, zero data leakage, augmentation label preservation, metrics calculation, and RF baseline fitting.
-- [x] **Jupyter Notebooks:** `notebooks/01_data_exploration.ipynb` and `notebooks/02_patch_visualization.ipynb`.
-
----
-
-## 🚫 Chunk 2: What Should NOT Be in Chunk 1 (Reserved for Teammates)
-
-The following components are intentionally left for Chunk 2 to maintain modularity:
-1. **Deep Learning Model Factory:** PyTorch U-Net with ResNet34 encoder and DeepLabV3+ model classes (`src/oilspill/models/factory.py`).
-2. **Loss Functions:** Weighted Cross-Entropy + Dice Loss / Focal Tversky Loss implementation (`src/oilspill/models/losses.py`).
-3. **Deep Training Engine:** PyTorch AMP (Automatic Mixed Precision), AdamW optimizer, CosineAnnealingLR scheduler, early stopping, and checkpoint management (`src/oilspill/training/train.py`, `engine.py`).
-4. **Experiment Tracking:** MLflow / WandB run logging and model comparison experiments (E0–E4).
+### 8. Unit Test Suite & Notebooks
+- [x] pytest suite: dataset shapes, patch coords, zero leakage, augmentation, metrics, RF fitting.
+- [x] Notebooks: 01_data_exploration.ipynb, 02_patch_visualization.ipynb.
 
 ---
 
-## 🚫 Chunk 3: What Should NOT Be in Chunk 1 (Reserved for Teammates)
+## Repository Status
 
-The following components are intentionally left for Chunk 3:
-1. **Full-Scene Tiled Inference Engine:** Sliding-window patch prediction, overlap blending/stitching, and confidence map generation (`src/oilspill/inference/predictor.py`, `tiling.py`).
-2. **FastAPI Backend Service:** REST endpoints (`/health`, `/model-info`, `/predict`, `/predict/overlay`, `/predict/compare`).
-3. **React + Tailwind Frontend UI:** Interactive web dashboard for SAR image upload, side-by-side mask visualization, confidence heatmaps, and error analysis comparison screens.
-4. **Containerization & Deployment:** Production `Dockerfile` and `docker-compose.yml`.
+| Item | Status |
+|:-----|:-------|
+| Code pushed to origin/main | YES -- commit 75be801 |
+| Dataset metadata committed | YES -- data/kaggle/metadata/ |
+| Raw images committed | NO -- excluded via .gitignore (kept local at C:\Users\Admin\Downloads\DL) |
+| Data pipeline verified on real data | YES -- 22,152 patches generated |
 
 ---
 
-## 🚀 How Teammates Can Run & Test Chunk 1
+## Chunk 2: What Should NOT Be in Chunk 1 (Reserved for Teammates)
 
-### 1. Setup & Environment
-```bash
+1. Deep Learning Model Factory: U-Net + ResNet34, DeepLabV3+ (src/oilspill/models/factory.py).
+2. Loss Functions: Weighted CE + Dice / Focal Tversky (src/oilspill/models/losses.py).
+3. Deep Training Engine: PyTorch AMP, AdamW, CosineAnnealingLR, early stopping, checkpoints.
+4. Experiment Tracking: MLflow / WandB run logging and experiments (E0-E4).
+
+---
+
+## Chunk 3: What Should NOT Be in Chunk 1 (Reserved for Teammates)
+
+1. Full-Scene Tiled Inference Engine: sliding-window prediction and stitching.
+2. FastAPI Backend Service: /health, /predict, /predict/overlay, /predict/compare.
+3. React + Tailwind Frontend UI: web dashboard for upload, visualization, heatmaps.
+4. Containerization: Dockerfile and docker-compose.yml.
+
+---
+
+## How Teammates Can Run Chunk 1
+
+Pre-requisite: Place raw SAR chips under data/kaggle/data/Class_0/ and data/kaggle/data/Class_1/
+(or update configs/base.yaml data.kaggle_dir to your local path).
+
+### 1. Setup
 pip install -r requirements.txt
 pip install -e .
-```
 
-### 2. Prepare Data (Audit + Split + Patches + Manifest)
-```bash
-# If raw Krestenitis dataset is placed in data/raw/:
+### 2. Prepare Data
 python scripts/prepare_data.py
 
-# If testing with synthetic benchmark scenes:
-python scripts/prepare_data.py --auto-generate
-```
-
-### 3. Generate Visual QA Contact Sheet & Audit
-```bash
+### 3. Audit & Visual QA
 python scripts/audit_dataset.py
-```
 
-### 4. Train & Evaluate Classical Random Forest Baseline
-```bash
+### 4. Train RF Baseline
 python scripts/train_baseline.py
-```
 
-### 5. Run All Unit Tests
-```bash
+### 5. Run Tests
 pytest
-```
