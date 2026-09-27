@@ -1,0 +1,46 @@
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Data artifacts (Raw & processed data should not be tracked by git)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/patches/*
+!data/patches/.gitkeep
+data/splits/*
+!data/splits/.gitkeep
+
+# Checkpoints and models
+artifacts/checkpoints/*
+!artifacts/checkpoints/.gitkeep
+artifacts/predictions/*
+!artifacts/predictions/.gitkeep
+artifacts/reports/*
+!artifacts/reports/.gitkeep
+
+# Jupyter & IDE
+.ipynb_checkpoints
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

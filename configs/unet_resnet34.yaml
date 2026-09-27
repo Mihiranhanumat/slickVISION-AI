@@ -1,0 +1,26 @@
+# Model Configuration: U-Net with ResNet34 Encoder (Chunk 2 Target)
+base_config: "configs/base.yaml"
+
+model:
+  architecture: "unet"
+  encoder_name: "resnet34"
+  encoder_weights: "imagenet"
+  in_channels: 1
+  classes: 5
+  activation: null # Return raw logits
+
+training:
+  batch_size: 16
+  epochs: 80
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealingLR"
+  min_lr: 1.0e-6
+  amp: true
+  early_stopping_patience: 12
+  loss:
+    name: "combined_ce_dice"
+    ce_weight: 0.5
+    dice_weight: 0.5
+    use_class_weights: true
