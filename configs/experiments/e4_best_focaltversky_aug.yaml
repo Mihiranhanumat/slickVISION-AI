@@ -1,0 +1,11 @@
+# E4 - Imbalance handling: Focal Tversky loss on the better of E2 / E3.
+# Default architecture is U-Net; scripts/run_experiments.py switches it automatically to the E2/E3 winner,
+# or run manually:  --set model.architecture=deeplabv3plus
+inherits: configs/unet_resnet34.yaml
+experiment: {id: E4, name: e4_best_focaltversky_aug}
+model: {classes: 2}
+training:
+  epochs: 30
+  early_stopping_patience: 8
+  loss: {name: focal_tversky, alpha: 0.7, beta: 0.3, gamma: 0.75, use_class_weights: false}
+augmentation: {enabled: true}

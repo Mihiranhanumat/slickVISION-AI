@@ -1,0 +1,35 @@
+experiment:
+  id: "S1"
+  name: "s1_segformer_mit_b2_cedice_aug"
+
+model:
+  architecture: "segformer"
+  pretrained_name: "nvidia/mit-b2"
+  in_channels: 1
+  classes: 2
+
+data:
+  image_size: 256
+  num_workers: 2
+
+training:
+  batch_size: 4
+  epochs: 15
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealingLR"
+  min_lr: 1.0e-6
+  amp: true
+  gradient_clip_norm: 1.0
+  early_stopping_patience: 5
+  loss:
+    name: "combined_ce_dice"
+    ce_weight: 0.5
+    dice_weight: 0.5
+    use_class_weights: true
+
+augmentation:
+  enabled: true
+
+seed: 42

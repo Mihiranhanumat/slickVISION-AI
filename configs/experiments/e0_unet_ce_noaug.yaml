@@ -1,0 +1,11 @@
+# E0 - Deep baseline: U-Net/ResNet34, plain cross-entropy, no augmentation.
+# NOTE: classes=2 because the Chunk-1 masks are binary (0 = background, 1 = oil). Epochs reduced from 80 to 30
+# so all five experiments fit in the time budget; early stopping still applies. Raise to 80 if time allows.
+inherits: configs/unet_resnet34.yaml
+experiment: {id: E0, name: e0_unet_ce_noaug}
+model: {classes: 2}
+training:
+  epochs: 30
+  early_stopping_patience: 8
+  loss: {name: ce, use_class_weights: false}
+augmentation: {enabled: false}

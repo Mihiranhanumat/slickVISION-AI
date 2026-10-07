@@ -1,0 +1,9 @@
+# E3 - Architecture comparison: DeepLabV3+/ResNet34, same loss/augmentation/split as E2.
+inherits: configs/deeplabv3plus.yaml
+experiment: {id: E3, name: e3_deeplab_cedice_aug}
+model: {classes: 2}
+training:
+  epochs: 80
+  early_stopping_patience: 12
+  loss: {name: combined_ce_dice, ce_weight: 0.5, dice_weight: 0.5, use_class_weights: true}
+augmentation: {enabled: true}

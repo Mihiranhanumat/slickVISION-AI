@@ -1,0 +1,29 @@
+experiment:
+  id: S1
+  name: s1_segformer_mit_b2_5class_cedice_aug
+
+model:
+  architecture: segformer
+  pretrained_name: nvidia/mit-b2
+  in_channels: 1
+  classes: 5
+
+data:
+  image_size: 256
+
+training:
+  batch_size: 2
+  epochs: 15
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  ce_weight: 0.5
+  dice_weight: 0.5
+  oil_class_id: 1
+  early_stopping_patience: 5
+  gradient_clip_norm: 1.0
+  amp: true
+
+augmentation:
+  enabled: true
+
+seed: 42

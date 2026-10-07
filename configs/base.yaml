@@ -1,0 +1,69 @@
+# Base Configuration for SAR Oil Spill Detection Pipeline
+
+project:
+  name: "slickVISION-AI"
+  description: "Oil Spill Detection from SAR Satellite Imagery"
+  seed: 42
+
+paths:
+  raw_data_dir: "data/raw"
+  kaggle_data_dir: "data/kaggle/data"
+  processed_data_dir: "data/processed"
+  patches_dir: "data/patches"
+  splits_dir: "data/splits"
+  artifacts_dir: "artifacts"
+  reports_dir: "artifacts/reports"
+  predictions_dir: "artifacts/predictions"
+  checkpoints_dir: "artifacts/checkpoints"
+
+dataset:
+  name: "csiro_sentinel1_oilspill"
+  source: "CSIRO Sentinel-1 SAR Dataset / Kaggle DL"
+  num_classes: 5
+  classes:
+    0: "sea_surface"
+    1: "oil_spill"
+    2: "look_alike"
+    3: "ship"
+    4: "land"
+  class_colors: # RGB visualization palette
+    0: [0, 0, 0]        # Sea surface - Black
+    1: [0, 255, 255]    # Oil spill - Cyan
+    2: [255, 0, 0]      # Look-alike - Red
+    3: [150, 0, 150]    # Ship - Purple / Magenta
+    4: [0, 100, 0]      # Land - Dark Green
+  image_width: 400
+  image_height: 400
+  channels: 1
+  val_split_ratio: 0.15 # 15% validation, 15% test, 70% train
+
+patching:
+  patch_size: 256
+  train_stride: 144    # Overlap for 400x400 chips -> 4 patches per chip
+  val_stride: 256      # Tiling for validation
+  test_stride: 256     # Tiling for test
+  pad_mode: "reflect"
+
+augmentation:
+  spatial:
+    horizontal_flip_prob: 0.5
+    vertical_flip_prob: 0.5
+    random_rotate90_prob: 0.5
+    shift_scale_rotate_prob: 0.3
+  intensity:
+    brightness_contrast_prob: 0.3
+    brightness_limit: 0.1
+    contrast_limit: 0.1
+    gaussian_blur_prob: 0.2
+    blur_limit: 3
+
+baseline_rf:
+  n_estimators: 100
+  max_depth: 16
+  min_samples_split: 10
+  n_samples_per_class: 30000
+  window_sizes: [3, 7, 15]
+  include_gradients: true
+  include_texture: true
+  random_state: 42
+  n_jobs: -1

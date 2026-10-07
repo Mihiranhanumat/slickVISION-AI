@@ -1,0 +1,57 @@
+IMPORTANT — THIS IS THE CORRECTED 5-CLASS VERSION
+
+Do NOT use the previous binary V2 trainer.
+
+Your project data preserves semantic IDs:
+0 = sea_surface
+1 = oil_spill
+2 = look_alike
+3 = ship
+4 = land
+
+The trainer in this pack DOES NOT convert mask > 0 to oil.
+It keeps all five labels.
+
+STEP 1
+------
+Install dependency if not already installed:
+pip install transformers
+
+STEP 2 — smoke test
+-------------------
+python scripts\smoke_test_segformer_5class.py
+
+Expected:
+Output shape: (1, 5, 256, 256)
+SMOKE TEST: OK
+
+STEP 3 — 15-epoch screening
+----------------------------
+python scripts\train_segformer_5class.py --epochs 15 --batch-size 2 --num-workers 2 --device cuda
+
+Model selection:
+- validation mean IoU
+- test split untouched
+
+Expected output files:
+artifacts/checkpoints/s1_segformer_mit_b2_5class_best.pth
+artifacts/reports/s1_segformer_mit_b2_5class_history.csv
+
+STEP 4 — final test evaluation
+------------------------------
+ONLY AFTER WE LOOK AT THE VALIDATION RESULTS:
+
+python scripts\evaluate_segformer_5class.py --checkpoint artifacts\checkpoints\s1_segformer_mit_b2_5class_best.pth --device cuda --num-workers 2
+
+The resulting report gives:
+- IoU/Dice/precision/recall for all 5 classes
+- mean IoU
+- mean Dice
+- oil IoU
+- oil Dice
+- pixel accuracy
+
+DO NOT:
+- merge look-alike/ship/land into oil
+- tune on the test set
+- use test performance to choose the model

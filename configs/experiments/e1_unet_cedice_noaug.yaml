@@ -1,0 +1,9 @@
+# E1 - Loss ablation: weighted CE + Dice, still no augmentation.
+inherits: configs/unet_resnet34.yaml
+experiment: {id: E1, name: e1_unet_cedice_noaug}
+model: {classes: 2}
+training:
+  epochs: 30
+  early_stopping_patience: 8
+  loss: {name: combined_ce_dice, ce_weight: 0.5, dice_weight: 0.5, use_class_weights: true}
+augmentation: {enabled: false}

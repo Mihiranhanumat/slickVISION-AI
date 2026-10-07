@@ -1,0 +1,29 @@
+# Core scientific & image processing
+numpy>=1.26.0
+pandas>=2.1.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+pillow>=10.0.0
+opencv-python>=4.8.0
+albumentations>=1.4.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+pyyaml>=6.0.1
+tqdm>=4.66.0
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+
+# Deep Learning (For Chunk 2 & beyond)
+torch>=2.2.0
+torchvision>=0.17.0
+segmentation-models-pytorch>=0.3.3
+
+# API & Deployment (For Chunk 3)
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-multipart>=0.0.9
+
+# Testing & Quality
+pytest>=8.0.0
+pytest-cov>=4.1.0
+ruff>=0.2.0
