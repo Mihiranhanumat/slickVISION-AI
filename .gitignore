@@ -51,3 +51,4 @@ artifacts/reports/*
 # OS
 .DS_Store
 Thumbs.db
+external/
