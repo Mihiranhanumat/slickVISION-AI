@@ -1,0 +1,38 @@
+{
+  "checkpoint": "C:\\Users\\Manas Kumar\\Downloads\\slickVISION-AI-main\\slickVISION-AI-main\\artifacts\\rescue_checkpoints\\stage1_20epoch\\refined_sos_best.pth",
+  "tta": true,
+  "best_validation_threshold": 0.5499999999999999,
+  "validation_default_0.5": {
+    "iou": 0.1068626241026759,
+    "dice": 0.19309103365796368,
+    "accuracy": 0.8065991597263277,
+    "precision": 0.14327796790245792,
+    "recall": 0.2960008547294059,
+    "tp": 4288696,
+    "fp": 25644001,
+    "fn": 10200100,
+    "tn": 145203011
+  },
+  "validation_best": {
+    "iou": 0.10694038697869977,
+    "dice": 0.19321796952514222,
+    "accuracy": 0.811737416657228,
+    "precision": 0.14528009951836815,
+    "recall": 0.28837151133883016,
+    "tp": 4178156,
+    "fp": 24581158,
+    "fn": 10310640,
+    "tn": 146265854
+  },
+  "test_final": {
+    "iou": 0.09741313843487885,
+    "dice": 0.17753229849937577,
+    "accuracy": 0.8102974048160043,
+    "precision": 0.127496156460899,
+    "recall": 0.29221122504448427,
+    "tp": 4460081,
+    "fp": 30522001,
+    "fn": 10803128,
+    "tn": 172056454
+  }
+}

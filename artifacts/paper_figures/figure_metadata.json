@@ -1,0 +1,44 @@
+[
+  {
+    "rank": 1,
+    "filename": "sentinel_479.png",
+    "iou": 0.998561810538136,
+    "dice": 0.9992803877997265,
+    "figure": "artifacts\\paper_figures\\refined_sos_val_example_01.png"
+  },
+  {
+    "rank": 2,
+    "filename": "sentinel_718.png",
+    "iou": 0.9964084307361147,
+    "dice": 0.9982009847240723,
+    "figure": "artifacts\\paper_figures\\refined_sos_val_example_02.png"
+  },
+  {
+    "rank": 3,
+    "filename": "sentinel_633.png",
+    "iou": 0.9958524164876861,
+    "dice": 0.9979218986944872,
+    "figure": "artifacts\\paper_figures\\refined_sos_val_example_03.png"
+  },
+  {
+    "rank": 4,
+    "filename": "sentinel_733.png",
+    "iou": 0.9936168564565817,
+    "dice": 0.9967982094840613,
+    "figure": "artifacts\\paper_figures\\refined_sos_val_example_04.png"
+  },
+  {
+    "rank": 5,
+    "filename": "sentinel_617.png",
+    "iou": 0.9934365203760134,
+    "dice": 0.9967074549117076,
+    "figure": "artifacts\\paper_figures\\refined_sos_val_example_05.png"
+  },
+  {
+    "rank": 6,
+    "filename": "sentinel_702.png",
+    "iou": 0.9918036731091521,
+    "dice": 0.9958849724992958,
+    "figure": "artifacts\\paper_figures\\refined_sos_val_example_06.png"
+  }
+]
